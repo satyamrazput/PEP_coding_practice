@@ -238,6 +238,7 @@ void generate_bill() {
     Sale s;
     int c_id, p_id, req_qty;
     bool found = false;
+    char cust_name[30] = "Unknown";
 
     cout << "\n\t\t--- GENERATE BILL ---\n";
     cout << "\t\t Enter Bill Number : "; 
@@ -257,6 +258,15 @@ void generate_bill() {
     
     cout << "\n\n\t\t Enter Customer ID : "; 
     cin >> c_id;
+
+    fc.open("cust.dat", ios::in | ios::binary);
+    while (fc.read((char*)&c, sizeof(c))) {
+        if (c.id == c_id) {
+            strcpy(cust_name, c.name);
+            break;
+        }
+    }
+    fc.close();
 
     fp_disp.open("prod.dat", ios::in | ios::binary);
     if (!fp_disp) { 
@@ -296,7 +306,22 @@ void generate_bill() {
                 fs.write((char*)&s, sizeof(s));
                 fs.close();
 
-                cout << "\n\t\t Bill Generated! Total Amount: Rs." << s.total_amount;
+                clearScreen();
+                cout << "\n\n\t\t==========================================";
+                cout << "\n\t\t               FINAL BILL                 ";
+                cout << "\n\t\t==========================================";
+                cout << "\n\t\t Bill No      : " << s.bill_no;
+                cout << "\n\t\t Customer ID  : " << c_id;
+                cout << "\n\t\t Customer Name: " << cust_name;
+                cout << "\n\t\t------------------------------------------";
+                cout << "\n\t\t Product ID   : " << p.id;
+                cout << "\n\t\t Product Name : " << p.name;
+                cout << "\n\t\t Quantity     : " << req_qty;
+                cout << "\n\t\t Price/Unit   : Rs. " << p.selling_price;
+                cout << "\n\t\t------------------------------------------";
+                cout << "\n\t\t TOTAL AMOUNT : Rs. " << s.total_amount;
+                cout << "\n\t\t==========================================\n";
+
             } else {
                 cout << "\n\t\t Insufficient Stock! Only " << p.qty << " available.";
             }
